@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/dv-formvalidation/dist/css/formValidation.min.css">
+    <title>Document</title>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="card-body">
+                <form action="" id="formUpload">
+                    <div class="mb-3">
+                        <label for="formFile" class="form-label">Default file input example</label>
+                        <input class="form-control" type="file" id="formFile" name="image" required>
+                    </div>
+                    <div class="col-auto">
+                        <button type="submit" class="btn btn-primary mb-3">Subir</button>
+                    </div>
+                </form>
+                <div class="row">
+                    <ul>
+                        <% files.forEach(function(file){ %>
+                            <li><a href="/viewFile/<%= file.name %>"><%= file.name %></a></li>
+                        <% }); %>
+
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="/jquery/dist/jquery.min.js"></script>
+    <script src="/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/axios/dist/axios.min.js"></script>
+    <script src="/js/main.js"></script>
+</body>
+</html>
