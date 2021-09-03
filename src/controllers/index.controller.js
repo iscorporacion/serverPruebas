@@ -55,7 +55,7 @@ modulo.create = async (req, res, next) => {
             fs.readFile(file, (err, contents) => {
                 dbx.filesUpload({ path: `/${req.file.filename}`, contents })
                     .then((response) => {
-                        res.status(200).json({error:0, message:"OK"});
+                        res.status(200).json({ error: 0, title:"Confirmación", message: "Archivo Cargado con éxito", file: req.file.filename});
                     })
                     .catch((uploadErr) => {
                         res.status(200).json(uploadErr);
@@ -63,7 +63,7 @@ modulo.create = async (req, res, next) => {
 
             });
         } else {
-            res.status(200).json(err);
+            res.status(401).json(err);
         }
     });
 }
@@ -73,17 +73,26 @@ modulo.download = async (req, res, next) => {
         const dbx = new Dropbox({ accessToken: config.settings.DROPBOX_TOKEN });
         dbx.filesDownload({ path: `/${form.file}` })
             .then((data) => {
-                console.log(data)
-                // fs.WriteStream  .writeFile(data.result.name, data.result.fileBinary, 'binary', (err) => {
-                //     if (err) { throw err; }
-                //     console.log(`File: ${data.result.name} saved.`);
-                    res.status(200).json({ error: 0, message: "OK" });
-                // });
+                res.end(data.result.fileBinary, 'binary');
             })
             .catch((err) => {
-                res.status(400).json({ error: 0, message: "NOT" });
+                res.status(400).json({ error: 0,title:"Error", message: "NOT" });
                 console.log(err);
-                // throw err;
+            });
+    });
+}
+modulo.delete = async (req, res, next) => {
+    params(req, res, async (err) => {
+        let form = req.body;
+        console.log(form)
+        const dbx = new Dropbox({ accessToken: config.settings.DROPBOX_TOKEN });
+        dbx.filesDeleteV2({ path: `/${form.file}` })
+            .then((data) => {
+                res.status(200).json({ error: 0, title: "Confirmación", message: "Archivo Eliminado" });
+            })
+            .catch((err) => {
+                res.status(400).json({ error: 0,title:"Error", message: "NOT" });
+                console.log(err);
             });
     });
 }

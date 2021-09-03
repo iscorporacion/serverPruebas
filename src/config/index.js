@@ -6,7 +6,7 @@ config.settings = {
     folders: {
         archivos: process.env.APP_FILES_DIR
     },
-    imageTypes:"jpg,png,jpeg,gif",
+    imageTypes:"jpg,png,jpeg,gif,xlsx,xls,pdf",
 }
 
 module.exports = config;
