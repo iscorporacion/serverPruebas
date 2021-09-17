@@ -12,7 +12,7 @@ const params = multer().single();
 const storageFilesIns = multer.diskStorage({
     destination: `${config.settings.folders.archivos}`,
     filename: function (req, file, callback) {
-        let extencion = path.extname(file.originalname);
+        let extencion = path.extname(file.originalname.toLowerCase());
         let extenciones = config.settings.imageTypes;
         if (extenciones.includes(extencion.slice(1))) {
             let filename = "";
@@ -35,11 +35,9 @@ const upload = multer({
 
 modulo.home = async (req, res, next) => {
     const dbx = new Dropbox({ accessToken: config.settings.DROPBOX_TOKEN });
-    //https://www.dropbox.com/s/7pojyjpjvfxjfo3/1630612906325.png?dl=0
     dbx.filesListFolder({
-        path: '' })
+        path: '', })
         .then((response) => {
-            console.log(response.result.entries);
             res.render("index", { files: response.result.entries});
         })
         .catch((err) => {
@@ -55,7 +53,13 @@ modulo.create = async (req, res, next) => {
             fs.readFile(file, (err, contents) => {
                 dbx.filesUpload({ path: `/${req.file.filename}`, contents })
                     .then((response) => {
-                        res.status(200).json({ error: 0, title:"Confirmación", message: "Archivo Cargado con éxito", file: req.file.filename});
+                        res.status(200).json({ error: 0, title: "Confirmación", message: "Archivo Cargado con éxito", file: req.file.filename });
+                        fs.unlink(file, (err) => {
+                            if (err) {
+                                console.error(err)
+                                return
+                            }
+                        })
                     })
                     .catch((uploadErr) => {
                         res.status(200).json(uploadErr);
@@ -84,7 +88,6 @@ modulo.download = async (req, res, next) => {
 modulo.delete = async (req, res, next) => {
     params(req, res, async (err) => {
         let form = req.body;
-        console.log(form)
         const dbx = new Dropbox({ accessToken: config.settings.DROPBOX_TOKEN });
         dbx.filesDeleteV2({ path: `/${form.file}` })
             .then((data) => {

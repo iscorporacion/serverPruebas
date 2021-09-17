@@ -1,12 +1,27 @@
 const formUpload = document.getElementById("formUpload");
 const fileList = document.getElementById("lista_archivos");
 const deleteButtons = document.querySelectorAll(".btnDelete");
-const loader = document.querySelector(".loader");
+// const loader = document.querySelector(".loader");
 
+const loader = async (msj = false) => {
+    const loader = document.querySelector(".loader");
+    loader.innerHTML = /*html*/`
+        <div class="row justify-content-center align-items-center hv-100">
+            <div class="spinner-border text-primary" role="status">
+            </div>    <br>
+            <span class="ml-2">${msj || "Realizando acción"}</span>
+        </div>
+    `;
+    if (msj) {
+        loader.classList.remove("hide");
+    } else {
+        loader.classList.add("hide");
+    }
+}
 formUpload.addEventListener("submit", function (e) {
     e.preventDefault();
     const formData = new FormData(this);
-    loader.classList.remove("hide");
+    loader("Cargando Archivo");
     axios({
         method: 'POST',
         url: "/createFile",
@@ -26,7 +41,8 @@ formUpload.addEventListener("submit", function (e) {
             itemLi.appendChild(btnDelete);
             fileList.appendChild(itemLi);
             fileList.scrollTop = fileList.scrollHeight - fileList.clientHeight;
-            loader.classList.add("hide");
+            loader();
+            e.target.reset();
             Swal.fire({
                 title: response.data.title,
                 text: response.data.message,
@@ -34,6 +50,7 @@ formUpload.addEventListener("submit", function (e) {
             });
         }
     }).catch(function (error) {
+        loader();
         Swal.fire({
             title: error.response.data.title,
             text: error.response.data.message,
@@ -49,11 +66,13 @@ let addEvent = (elemento) => {
         deleteFile(id, elemento);
     })
 }
+
 deleteButtons.forEach(element => addEvent(element));
+
 let deleteFile = (file,elemento) => {
     const formData = new FormData();
     formData.append("file", file);
-    loader.classList.remove("hide");
+    loader("Eliminando Archivo");
     axios({
         method: 'DELETE',
         url: "/deleteFile",
@@ -65,7 +84,7 @@ let deleteFile = (file,elemento) => {
             confirmButtonText: `Aceptar`,
         });
         fileList.removeChild(elemento.parentNode);
-        loader.classList.add("hide");
+        loader();
     }).catch(function (error) {
         Swal.fire({
             title: error.response.data.title,
